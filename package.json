@@ -1,0 +1,22 @@
+{
+  "name": "s3-test",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "start:db": "docker compose up"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.654.0",
+    "@aws-sdk/s3-request-presigner": "^3.654.0",
+    "@types/node": "^22.5.5",
+    "axios": "^1.7.7",
+    "tsx": "^4.19.1"
+  }
+}
