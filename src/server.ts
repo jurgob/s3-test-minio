@@ -4,7 +4,6 @@ import { generatePresignedUrl, uploadStream } from ".";
 import axios from 'axios';
 import { Readable } from 'stream';
 
-// Create an Express application
 const app = express();
 type HTTPError = {
     status: number,
@@ -67,11 +66,7 @@ app.get('/api/uploads/images', async (req: Request, res: Response) => {
         if (!contentType.startsWith('image/')) {
             throw new Error('The URL does not point to an image');
         }
-
         const imageStream = response.data as Readable;
-
-
-        // uploadImageUrlWithPresignedUrl(put, imageUrl)
         await uploadStream(put, imageStream, contentLength.toString(), contentType);
 
 
@@ -110,11 +105,6 @@ const httpError = (res: Response, err: unknown) => {
         });
     }
 };
-
-
-
-
-
 
 // Start the server on port 3000
 const PORT = 3000;
