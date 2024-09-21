@@ -1,5 +1,4 @@
 import axios from "axios";
-import { join } from 'path';
 import {createReadStream,statSync} from "fs";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -13,22 +12,21 @@ const s3Client = new S3Client({
     endpoint: "http://127.0.0.1:9000",
 });
 
-const generatePresignedUrl = async (objectKey: string, cmd : "get"| "put"): Promise<string> => {
+export const generatePresignedUrl = async (objectKey: string, cmd : "get"| "put"): Promise<string> => {
     const bucketName: string = "miniobucket";
     if (!["get", "put"].includes(cmd)){
         throw "unkdonw cmd option"
     }
     let CmdObj = cmd === "put" ? PutObjectCommand : GetObjectCommand
 
+    const commandOptions = {
+        Bucket: bucketName,
+        Key: objectKey,
+      }
+
     const command = cmd === "put" 
-        ? new PutObjectCommand({
-            Bucket: bucketName,
-            Key: objectKey,
-          }) 
-        : new GetObjectCommand({
-            Bucket: bucketName,
-            Key: objectKey,
-          }) 
+        ? new PutObjectCommand(commandOptions) 
+        : new GetObjectCommand(commandOptions) 
         
     try {
       const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 600 });
@@ -41,7 +39,7 @@ const generatePresignedUrl = async (objectKey: string, cmd : "get"| "put"): Prom
   };
 
 
-  const uploadFileWithPresignedUrl = async (presignedUrl: string, filePath: string): Promise<void> => {
+export  const uploadFileWithPresignedUrl = async (presignedUrl: string, filePath: string): Promise<void> => {
     const fileStream = createReadStream(filePath);
     const fileStats = statSync(filePath);
   
@@ -64,16 +62,3 @@ const generatePresignedUrl = async (objectKey: string, cmd : "get"| "put"): Prom
         }
     }
   };
-
-async function main(){
-    const objectKey = "canaglia"
-    const uploadUrl = await generatePresignedUrl(objectKey, "put");
-    console.log(`uploadUrl: \n`,uploadUrl)
-    const imagePath = join(__dirname, "../assets/test.jpeg");
-    await uploadFileWithPresignedUrl(uploadUrl, imagePath)
-    const getUrl = await generatePresignedUrl(objectKey, "get");
-    console.log(`getUrl: \n`,getUrl)
-    
-}
-
-main()

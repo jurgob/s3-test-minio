@@ -3,20 +3,29 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "start:db": "docker compose up"
+    "cli": "tsx src/cli.ts",
+    "start:db": "docker compose up",
+    "server": "tsx src/server.ts",
+    "dev:server": "node --import=tsx --watch src/server.ts",
+    "dev": "concurrently --kill-others=true 'npm run start:db' 'npm run dev:server' "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^5.6.2"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "concurrently": "^9.0.1",
+    "typescript": "^5.6.2",
+    "wait-on": "^8.0.1"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.654.0",
     "@aws-sdk/s3-request-presigner": "^3.654.0",
-    "@types/node": "^22.5.5",
     "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
     "tsx": "^4.19.1"
   }
 }
