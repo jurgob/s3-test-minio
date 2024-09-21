@@ -2,6 +2,8 @@ import axios from "axios";
 import {createReadStream,statSync} from "fs";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { stat} from "fs/promises";
+import { Readable } from "node:stream";
 
 const s3Client = new S3Client({ 
     region: "REGION",
@@ -41,24 +43,29 @@ export const generatePresignedUrl = async (objectKey: string, cmd : "get"| "put"
 
 export  const uploadFileWithPresignedUrl = async (presignedUrl: string, filePath: string): Promise<void> => {
     const fileStream = createReadStream(filePath);
-    const fileStats = statSync(filePath);
+    const fileStats = await stat(filePath);
+
+    await uploadStream(presignedUrl, fileStream, fileStats.size.toString(), "image/jpeg")
+
+};
+
+export  const uploadStream = async (presignedUrl: string, readStream: Readable, contentLength: string, contentType: string): Promise<void> => {
+  try {
+    const response = await axios.put(presignedUrl, readStream, {
+      headers: {
+        'Content-Type': "image/jpeg",
+        'Content-Length': contentLength,
+      },
+    });
   
-    try {
-      // Upload the file using PUT request
-      const response = await axios.put(presignedUrl, fileStream, {
-        headers: {
-          'Content-Type': "image/jpeg",
-          'Content-Length': fileStats.size,
-        },
-      });
-    
-    } catch (error:any ) {
-        console.error("ERROR UPLOADING THE IMAGE:")
-        if (error.response) {
-            console.error(error.response?.data)
-            return 
-        }else{
-            console.log(error)
-        }
-    }
-  };
+  } catch (error:any ) {
+      console.error("ERROR UPLOADING THE IMAGE:")
+      if (error.response) {
+          console.error(error.response?.data)
+          return 
+      }else{
+          console.log(error)
+      }
+      throw error;
+  }
+};

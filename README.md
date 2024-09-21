@@ -20,6 +20,12 @@ npm run dev
 
 then go with your browser into:  ```http://localhost:3000/api/urls/yourkey```
 
+if you want to upload an image, use the `/api/uploads/url`. e.g: 
+
+```http://localhost:3000/api/uploads/images?key=cat1&url=https://static.boredpanda.com/blog/wp-content/uploads/2018/04/5acb63d83493f__700-png.jpg```
+
+then go to the get url
+
 
 the dev script will automatically spin up minio and create a default bucket usind docker compose
 
